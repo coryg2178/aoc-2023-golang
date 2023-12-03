@@ -3,12 +3,26 @@ package main
 import (
 	"regexp"
 	"strconv"
+	"strings"
 	s "strings"
 
 	"github.com/jpillora/puzzler/harness/aoc"
 )
 
-var alphabetRegex = regexp.MustCompile(`[^0-9]+`)
+var alphabetRegex = regexp.MustCompile(`([^1-9])`)
+var alphaNumRegex = regexp.MustCompile(`([1-9]|one|two|three|four|five|six|seven|eight|nine)`)
+var numReplace = strings.NewReplacer("oneight", "18", "threeight", "38", "fiveight", "58", "nineight", "98", "twone", "21", "eightwo", "82")
+var numMap = map[string]string{
+	"one":   "1",
+	"two":   "2",
+	"three": "3",
+	"four":  "4",
+	"five":  "5",
+	"six":   "6",
+	"seven": "7",
+	"eight": "8",
+	"nine":  "9",
+}
 
 func main() {
 	aoc.Harness(run)
@@ -25,7 +39,24 @@ func run(part2 bool, input string) any {
 	sumCalVals := 0
 	// when you're ready to do part 2, remove this "not implemented" block
 	if part2 {
-		return "not implemented"
+		for _, str := range inputArr {
+			str = numReplace.Replace(str)
+			numList := alphaNumRegex.FindAllString(str, -1)
+
+			first, last := numList[0], numList[len(numList)-1]
+
+			if val, ok := numMap[first]; ok {
+				first = val
+			}
+
+			if val, ok := numMap[last]; ok {
+				last = val
+			}
+
+			val, _ := strconv.Atoi(string(first) + string(last))
+			sumCalVals += val
+		}
+		return sumCalVals
 	}
 	// solve part 1 here
 	for _, str := range inputArr {
