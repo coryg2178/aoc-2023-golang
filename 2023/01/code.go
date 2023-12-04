@@ -3,15 +3,14 @@ package main
 import (
 	"regexp"
 	"strconv"
-	"strings"
 	s "strings"
 
 	"github.com/jpillora/puzzler/harness/aoc"
 )
 
-var alphabetRegex = regexp.MustCompile(`([^1-9])`)
-var alphaNumRegex = regexp.MustCompile(`([1-9]|one|two|three|four|five|six|seven|eight|nine)`)
-var numReplace = strings.NewReplacer("oneight", "18", "threeight", "38", "fiveight", "58", "nineight", "98", "twone", "21", "eightwo", "82")
+var numRegex = regexp.MustCompile(`(\d)`)
+var alphaNumRegex = regexp.MustCompile(`(\d|one|two|three|four|five|six|seven|eight|nine)`)
+var numReplace = s.NewReplacer("oneight", "18", "threeight", "38", "fiveight", "58", "nineight", "98", "twone", "21", "eightwo", "82")
 var numMap = map[string]string{
 	"one":   "1",
 	"two":   "2",
@@ -60,7 +59,7 @@ func run(part2 bool, input string) any {
 	}
 	// solve part 1 here
 	for _, str := range inputArr {
-		substr := alphabetRegex.ReplaceAllString(str, "")
+		substr := numRegex.FindAllString(str, -1)
 		val, _ := strconv.Atoi(string(substr[0]) + string(substr[len(substr)-1]))
 		sumCalVals += val
 	}
