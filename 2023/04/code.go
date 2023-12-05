@@ -1,8 +1,8 @@
 package main
 
 import (
+	"math"
 	re "regexp"
-	"slices"
 	s "strings"
 
 	"github.com/jpillora/puzzler/harness/aoc"
@@ -24,7 +24,21 @@ func run(part2 bool, input string) any {
 	inputSlice := s.Split(input, "\n")
 	// when you're ready to do part 2, remove this "not implemented" block
 	if part2 {
-		return "not implemented"
+		inputArr := make([]int, len(inputSlice))
+		totalPoints := 0
+		for i, card := range inputSlice {
+			winningNums := numRegex.FindAllString(s.Split(s.Split(card, ": ")[1], "| ")[0], -1)
+			haveNums := numRegex.FindAllString(s.Split(s.Split(card, ": ")[1], "| ")[1], -1)
+
+			matches := intersect(winningNums, haveNums)
+
+			for j := i + 1; j <= i+len(matches); j++ {
+				inputArr[j] += (1 + inputArr[i])
+			}
+
+			totalPoints += (1 + inputArr[i])
+		}
+		return totalPoints
 	}
 	// solve part 1 here
 	totalPoints := 0
@@ -32,19 +46,27 @@ func run(part2 bool, input string) any {
 		winningNums := numRegex.FindAllString(s.Split(s.Split(card, ": ")[1], "| ")[0], -1)
 		haveNums := numRegex.FindAllString(s.Split(s.Split(card, ": ")[1], "| ")[1], -1)
 
-		points := 0
-		for _, num := range haveNums {
-			if slices.Contains(winningNums, num) {
-				if points == 0 {
-					points = 1
-				} else {
-					points *= 2
-				}
-			}
-		}
+		matches := intersect(winningNums, haveNums)
 
-		totalPoints += points
+		totalPoints += int(math.Pow(float64(2), float64(len(matches)-1)))
 	}
 
 	return totalPoints
+}
+
+func intersect(a []string, b []string) []string {
+	set := make([]string, 0)
+	hash := make(map[string]bool)
+
+	for _, val := range a {
+		hash[val] = true
+	}
+
+	for _, val := range b {
+		if hash[val] {
+			set = append(set, val)
+		}
+	}
+
+	return set
 }
